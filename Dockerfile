@@ -8,7 +8,10 @@ ENV DEBCONF_NOWARNINGS=yes
 ENV PATH="/usr/local/texlive/bin:$PATH"
 ENV LC_ALL=C
 
-# パッケージのインストール
+#----------
+# install packages
+#----------
+# general packages of ubuntu
 RUN apt-get update && \
     apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
@@ -30,13 +33,13 @@ RUN apt-get update && \
     poppler-utils \
     software-properties-common
 
-# Perlモジュールのインストール（cpanm使用）
+# install "GCString" module with cpanm
 RUN cpanm --notest Unicode::GCString
 
-# MintedのためのPygmentsをインストール
+# install "pygments" for minted
 RUN pip3 install --no-cache-dir pygments
 
-# Node.js、Inkscapeのリポジトリ追加
+# add repository for Node.js & Inkscape
 RUN mkdir -p /etc/apt/keyrings && \
     curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
     NODE_MAJOR=20 && \
@@ -45,7 +48,11 @@ RUN mkdir -p /etc/apt/keyrings && \
     apt-get update && \
     apt-get install -y --no-install-recommends inkscape nodejs
 
-# 不要なパッケージの削除
+# install textlint with npm
+RUN npm install -g textlint && \
+    npm cache clean --force
+
+# remove unnecessary packages
 RUN apt-get remove -y --purge \
     software-properties-common \
     build-essential \
@@ -61,9 +68,11 @@ RUN apt-get remove -y --purge \
 #----------
 # install TeX Live 2024
 #----------
+# define TeXLive version and CTAN mirror
 ARG TEXLIVE_VERSION=2024
 ARG TEXLIVE_MIRROR="https://ftp.jaist.ac.jp/pub/CTAN/systems/texlive/tlnet/"
 
+# install TeXLive from CTAN mirror
 RUN mkdir /tmp/install-tl-unx && \
     curl -L ${TEXLIVE_MIRROR}/install-tl-unx.tar.gz | tar -xzv -C /tmp/install-tl-unx --strip-components=1 && \
     /bin/echo -e 'selected_scheme scheme-basic\ntlpdbopt_install_docfiles 0\ntlpdbopt_install_srcfiles 0' \
@@ -81,18 +90,14 @@ RUN mkdir /tmp/install-tl-unx && \
 RUN tlmgr update --repository ${TEXLIVE_MIRROR} --self --all && \
     tlmgr --repository ${TEXLIVE_MIRROR} install \
         collection-bibtexextra \
-        # collection-fontsrecommended \
-        # collection-langenglish \
         collection-latexextra \
         collection-latexrecommended \
         collection-luatex \
         collection-langjapanese \
         collection-mathscience \
-        # collection-plaingeneric \
-        # collection-xetex \
-		latexmk \
-		latexdiff \
-		latexindent && \
+        latexmk \
+        latexdiff \
+        latexindent && \
     mktexlsr
 
 #----------
@@ -104,5 +109,7 @@ RUN	curl -L -O https://raw.githubusercontent.com/being24/latex-docker/master/cre
     rm create_font_cache.sh && \
     useradd -m -u 1000 -s /bin/bash latex
         
-# 作業ディレクトリ設定
+#----------
+# set working directry
+#----------
 WORKDIR /workdir

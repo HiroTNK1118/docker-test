@@ -95,6 +95,7 @@ RUN tlmgr update --repository ${TEXLIVE_MIRROR} --self --all && \
         collection-luatex \
         collection-langjapanese \
         collection-mathscience \
+        collection-pictures \
         latexmk \
         latexdiff \
         latexindent && \

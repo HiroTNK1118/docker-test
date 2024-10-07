@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main  # mainブランチにpushされたときに実行
+  workflow_dispatch:  # 手動のActionsトリガー
 
 env:
   REGISTRY: ghcr.io
@@ -16,8 +17,8 @@ jobs:
 
     # イメージをプッシュする権限をGITHUB_TOKENに付与
     permissions:
-      contents: read
-      packages: write
+      contents: read  # コードを読み取る権限
+      packages: write  # ghcr.ioにパッケージをpushする権限
 
     steps:
       # GitHubリポジトリをチェックアウト
@@ -32,9 +33,9 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       
-      # Dockerイメージのビルド
+      # Docker Buildxのセットアップ
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
 
       # Dockerイメージをビルドしてghcr.ioにプッシュ
       - name: Build and push Docker image
@@ -44,7 +45,10 @@ jobs:
           push: true
           # イメージタグとリポジトリ名を指定
           tags: ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+          # キャッシュの利用
+          cache-from: type=gha
+          cache-to: type=gha, mode=max
 
       # キャッシュをクリア（オプション、サイズ削減のため）
-      - name: Clean up Docker cache
-        run: docker builder prune -f
+      # - name: Clean up Docker cache
+      #   run: docker builder prune -f

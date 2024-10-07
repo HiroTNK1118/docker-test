@@ -9,7 +9,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: docker-test
-  IMAGE_TAG: 0.2.0
+  IMAGE_TAG: 0.3.0
 
 jobs:
   build-and-push:

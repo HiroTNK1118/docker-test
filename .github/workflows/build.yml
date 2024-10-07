@@ -22,7 +22,7 @@ jobs:
 
     steps:
       # GitHubリポジトリをチェックアウト
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v3
 
       # ghcr.ioにログイン
@@ -38,6 +38,17 @@ jobs:
         uses: docker/setup-buildx-action@v3
         with:
           install: true  # Buildxをインストール
+
+      # メタデータを生成（latestタグを追加）
+      - name: Extract metadata for Docker image
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=${{ env.IMAGE_TAG }}  # ブランチベースのタグ
+            type=ref,event=branch,branch=main,pattern=latest  # mainブランチにpushされた場合にlatestタグを付与
 
       # Dockerイメージをビルドしてghcr.ioにプッシュ
       - name: Build and push Docker image

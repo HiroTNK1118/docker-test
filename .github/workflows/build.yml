@@ -55,9 +55,10 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          file: ./Dockerfile
           push: true
-          # イメージタグとリポジトリ名を指定
-          tags: ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+          # イメージタグを指定
+          tags: ${{ steps.meta.outputs.tags }}
           # キャッシュの利用
           cache-from: type=gha
           cache-to: type=gha, mode=max

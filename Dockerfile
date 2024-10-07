@@ -65,7 +65,8 @@ RUN apt-get update && \
 #----------
 # define TeXLive version and CTAN mirror
 ARG TEXLIVE_VERSION=2024
-ARG TEXLIVE_MIRROR="https://ftp.jaist.ac.jp/pub/CTAN/systems/texlive/tlnet/"
+# ARG TEXLIVE_MIRROR="https://ftp.jaist.ac.jp/pub/CTAN/systems/texlive/tlnet/"
+ARG TEXLIVE_MIRROR="https://mirror.ctan.org/systems/texlive/tlnet/"
 
 # install TeXLive from CTAN mirror
 RUN mkdir /tmp/install-tl-unx && \

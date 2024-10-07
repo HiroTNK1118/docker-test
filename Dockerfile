@@ -19,7 +19,7 @@ RUN apt-get update && \
     curl \
     make \
     ca-certificates \
-    gnupg \
+    gnupg2 \
     python3 \
     python3-pip \
     libfreetype6-dev \
@@ -53,7 +53,7 @@ RUN apt-get update && \
     build-essential \
     unzip \
     make \
-    gnupg \
+    gnupg2 \
     less && \
     apt-get clean && \
     apt-get autoremove -y && \

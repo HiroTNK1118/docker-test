@@ -44,8 +44,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: |
-            ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}
+          images: ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}
           tags: |
             type=raw,value=${{ env.IMAGE_TAG }}  # ブランチベースのタグ
             type=ref,event=branch,branch=main,pattern=latest  # mainブランチにpushされた場合にlatestタグを付与
@@ -57,6 +56,8 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
+          # 対応するアーキテクチャを指定
+          platforms: linux/amd64,linux/arm64
           # イメージタグを指定
           tags: ${{ steps.meta.outputs.tags }}
           # キャッシュの利用

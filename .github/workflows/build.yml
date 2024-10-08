@@ -47,7 +47,7 @@ jobs:
           images: ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}
           tags: |
             type=raw,value=${{ env.IMAGE_TAG }}  # ブランチベースのタグ
-            type=ref,event=branch,branch=main,pattern=latest  # mainブランチにpushされた場合にlatestタグを付与
+            type=raw,value=latest  # mainブランチにpushされた場合にlatestタグを付与
 
       # Dockerイメージをビルドしてghcr.ioにプッシュ
       - name: Build and push Docker image

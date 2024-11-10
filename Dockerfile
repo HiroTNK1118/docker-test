@@ -92,9 +92,9 @@ RUN tlmgr update --repository ${TEXLIVE_MIRROR} --self --all && \
         collection-langjapanese \
         collection-mathscience \
         collection-pictures \
-        stix2-otf \
         latexmk \
         latexdiff \
+        stix2-otf \
         latexindent && \
     mktexlsr
 

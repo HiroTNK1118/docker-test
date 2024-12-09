@@ -92,6 +92,7 @@ RUN tlmgr update --repository ${TEXLIVE_MIRROR} --self --all && \
         collection-langjapanese \
         collection-mathscience \
         collection-pictures \
+        tikz \
         latexmk \
         latexdiff \
         stix2-otf \

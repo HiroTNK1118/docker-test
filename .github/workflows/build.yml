@@ -11,17 +11,11 @@ env:
   IMAGE_NAME: docker-test
   TEXLIVE_VER: 24
   IMAGE_VER: 0
+  ARCHS: linux/amd64, linux/arm64
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-
-    # イメージの対象アーキテクチャを指定
-    strategy:
-      matrix:
-        arch:
-          - amd64
-          - arm64
 
     # イメージをプッシュする権限をGITHUB_TOKENに付与
     permissions:
@@ -54,7 +48,7 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
         with:
-          platforms: linux/${{ matrix.arch }}
+          platforms: ${{ env.ARCHS }}
       
       # Docker Buildxのセットアップ
       - name: Set up Docker Buildx
@@ -78,42 +72,48 @@ jobs:
           file: ./Dockerfile
           push: true
           # 対応するアーキテクチャを指定
-          platforms: linux/${{ matrix.arch }}
+          platforms: ${{ env.ARCHS }}
           # イメージタグを指定
           tags: ${{ steps.meta.outputs.tags }}
           # キャッシュの利用
           cache-from: type=gha
           cache-to: type=gha, mode=max
-  
-  release-to-github:
-    runs-on: ubuntu-latest
-    # リリースをプッシュする権限をGITHUB_TOKENに付与
-    permissions:
-      contents: write  # releaseをpushする権限
 
+  release-to-github:
+    needs: build-and-push
+    runs-on: ubuntu-latest
     steps:
       # GitHubリポジトリをチェックアウト
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: -1
 
-      # リリースタグの生成
+      # イメージタグの生成
       - name: create image tag
         run: |
           REV=0
           while git show-ref --tags | grep -q "refs/tags/${{ env.TEXLIVE_VER }}.${{ env.IMAGE_VER }}.${REV}"; do
           REV=$((REV+1))
           done
-          echo "IMAGE_TAG=${{ env.TEXLIVE_VER }}.${REV}" >> $GITHUB_ENV
+          echo "RELEASE_TAG=${{ env.TEXLIVE_VER }}.${{ env.IMAGE_VER }}.${REV}" >> $GITHUB_ENV
 
+      # リリース日の取得
+      - name: Set current day of month as env variable
+        env:
+          TZ: 'Asia/Tokyo' # タイムゾーン指定
+        run: echo "DATE=$(date +'%Y/%m/%d')" >> $GITHUB_ENV
+  
       # GitHubリポジトリにリリースを作成
       - name: Create GitHub Release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ env.IMAGE_TAG }}
-          release_name: docker-test-base ${{ env.IMAGE_TAG }}
+          tag_name: ${{ env.RELEASE_TAG }}
+          release_name: docker-test ${{ env.RELEASE_TAG }} (${{ env.DATE }})
           body: |
-            ## リリースノート
-            自動生成されたリリースです
+            ## Added
+            ## Changed
+            ## Fixed
           draft: true

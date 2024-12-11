@@ -67,8 +67,8 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}
           tags: |
-            type=raw,value=latest-${{ matrix.arch }} # mainブランチにpushされた場合にlatestタグを付与
-            type=raw,value=${{ env.IMAGE_TAG }}-${{ matrix.arch }}  # ブランチベースのタグ
+            type=raw,value=latest # mainブランチにpushされた場合にlatestタグを付与
+            type=raw,value=${{ env.IMAGE_TAG }}  # ブランチベースのタグ
 
       # Dockerイメージをビルドしてghcr.ioにプッシュ
       - name: Build and push Docker image
@@ -85,26 +85,35 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha, mode=max
   
-  # release-to-github:
-  #   needs: build-and-push
-  #   runs-on: ubuntu-latest
-  #   # リリースをプッシュする権限をGITHUB_TOKENに付与
-  #   permissions:
-  #     contents: write  # releaseをpushする権限
+  release-to-github:
+    runs-on: ubuntu-latest
+    # リリースをプッシュする権限をGITHUB_TOKENに付与
+    permissions:
+      contents: write  # releaseをpushする権限
 
-  #   steps:
-  #     # GitHubリポジトリをチェックアウト
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v3
+    steps:
+      # GitHubリポジトリをチェックアウト
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-  #     # GitHubリポジトリにリリースを作成
-  #     - name: Create GitHub Release
-  #       uses: actions/create-release@v1
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #       with:
-  #         tag_name: ${{ env.IMAGE_TAG }}
-  #         release_name: docker-test-base ${{ env.IMAGE_TAG }}
-  #         body: |
-  #           ## リリースノート
-  #           自動生成されたリリースです
+      # リリースタグの生成
+      - name: create image tag
+        run: |
+          REV=0
+          while git show-ref --tags | grep -q "refs/tags/${{ env.TEXLIVE_VER }}.${{ env.IMAGE_VER }}.${REV}"; do
+          REV=$((REV+1))
+          done
+          echo "IMAGE_TAG=${{ env.TEXLIVE_VER }}.${REV}" >> $GITHUB_ENV
+
+      # GitHubリポジトリにリリースを作成
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.IMAGE_TAG }}
+          release_name: docker-test-base ${{ env.IMAGE_TAG }}
+          body: |
+            ## リリースノート
+            自動生成されたリリースです
+          draft: true

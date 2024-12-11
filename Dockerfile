@@ -33,7 +33,7 @@ RUN apt-get update && \
     poppler-utils \
     software-properties-common && \
     # install perl module for latexindent
-    cpanm --notest Unicode::GCString YAML::Tiny File::Homedir && \
+    cpanm --notest Unicode::GCString YAML::Tiny File::HomeDir && \
     # install "pygments" for minted
     pip3 install --no-cache-dir pygments && \
     # add repository for Node.js & Inkscape

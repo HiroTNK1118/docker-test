@@ -2,14 +2,16 @@
 
 TeX LiveをDocker上で動かすためのコンテナビルド用リポジトリ
 
-| ver.  |  release   | ubuntu | TeX Live |    Arch.     | repository                                                                                           |
+| Ver.  |  date   | ubuntu | texlive |    Arch.     | repository                                                                                           |
 | :---: | :--------: | :----: | :------: | :----------: | ---------------------------------------------------------------------------------------------------- |
 | 0.1.0 | 2024/9/30  | 22.04  |   2024   |    amd64     | [ghcr.io](https://github.com/HiroTNK1118/docker-test/pkgs/container/docker-test/281401957?tag=0.1.0) |
 | 0.2.0 | 2024/10/7  | 22.04  |   2024   |    amd64     | [ghcr.io](https://github.com/HiroTNK1118/docker-test/pkgs/container/docker-test/285022331?tag=0.2.0) |
 | 0.3.0 | 2024/10/8  | 22.04  |   2024   |    amd64     | [ghcr.io](https://github.com/HiroTNK1118/docker-test/pkgs/container/docker-test/285022331?tag=0.2.0) |
 | 0.4.0 | 2024/10/8  | 22.04  |   2024   | amd64, arm64 | [ghcr.io](https://github.com/HiroTNK1118/docker-test/pkgs/container/docker-test/285739845?tag=0.4.0) |
 | 0.5.0 | 2024/11/10 | 22.04  |   2024   | amd64, arm64 | [ghcr.io](https://github.com/HiroTNK1118/docker-test/pkgs/container/docker-test/303239648?tag=0.5.0) |
-| 0.6.0 | 2024/12/11  | 24.04  |   2024   | amd64, arm64 | [ghcr.io]()                                                                                          |
+| 24.24.0 | 2024/12/11  | 24.04  |   2024   | amd64, arm64 | [ghcr.io]()                                                                                          |
+
+※24.24.0以降よりバージョン命名法を「ubuntuのバージョン.texliveのバージョン.リビジョン番号」に変更しました
 
 ## 概要
 

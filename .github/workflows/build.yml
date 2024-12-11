@@ -9,7 +9,9 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: docker-test
-  IMAGE_TAG: 0.6.0
+  UBUNTU_VER: 24
+  TEXLIVE_VER: 24
+  IMAGE_REV: 0
   ARCHS: linux/amd64, linux/arm64
 
 jobs:
@@ -53,7 +55,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}
           tags: |
-            type=raw,value=${{ env.IMAGE_TAG }}  # ブランチベースのタグ
+            type=raw,value=${{ env.UBUNTU_VER }}.${{ env.TEXLIVE_VER }}.${{ env.IMAGE_REV }}  # ブランチベースのタグ
             type=raw,value=latest  # mainブランチにpushされた場合にlatestタグを付与
 
       # Dockerイメージをビルドしてghcr.ioにプッシュ

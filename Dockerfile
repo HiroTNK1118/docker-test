@@ -46,17 +46,17 @@ RUN tlmgr update --repository ${TEXLIVE_MIRROR} --self --all && \
         latexindent && \
     mktexlsr
 
+
 #----------
 # install create_font_cache.sh
 #----------
 RUN	curl -L -O https://raw.githubusercontent.com/being24/latex-docker/master/create_font_cache.sh && \
     chmod +x create_font_cache.sh && \
     ./create_font_cache.sh && \
-    rm create_font_cache.sh && \
-    useradd -m -u 1000 -s /bin/bash latex
-        
+    rm create_font_cache.sh
+
+
 #----------
 # set user and working directry
 #----------
-USER latex
 WORKDIR /workdir

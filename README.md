@@ -9,7 +9,7 @@ TeX LiveをDocker上で動かすためのコンテナビルド用リポジトリ
 | 0.3.0 | 2024/10/8  | 22.04  |   2024   |    amd64     | [ghcr.io](https://github.com/HiroTNK1118/docker-test/pkgs/container/docker-test/285022331?tag=0.2.0) |
 | 0.4.0 | 2024/10/8  | 22.04  |   2024   | amd64, arm64 | [ghcr.io](https://github.com/HiroTNK1118/docker-test/pkgs/container/docker-test/285739845?tag=0.4.0) |
 | 0.5.0 | 2024/11/10 | 22.04  |   2024   | amd64, arm64 | [ghcr.io](https://github.com/HiroTNK1118/docker-test/pkgs/container/docker-test/303239648?tag=0.5.0) |
-| 0.6.0 | 2024/12/9  | 22.04  |   2024   | amd64, arm64 | [ghcr.io]()                                                                                          |
+| 0.6.0 | 2024/12/11  | 24.04  |   2024   | amd64, arm64 | [ghcr.io]()                                                                                          |
 
 ## 概要
 
@@ -21,19 +21,19 @@ TeX LiveをDocker上で動かすためのコンテナビルド用リポジトリ
 
 ## 使い方
 
-次のリポジトリの卒論執筆テンプレートを使用してください
+[卒論執筆テンプレートのリポジトリ](https://github.com/HiroTNK1118/latex-template-kanekolab)を参照ください
 
 ## 収録される主なLaTeXパッケージ
 
+※`collection-__`に含まれるパッケージは[こちら](https://gist.github.com/nox40/6255eef548ccad9881ce7202e3bb75dd#file-collection-depends-md)を参照ください
+
 - `collection-bibtexextra`
-  - biblatexや関連パッケージ
 - `collection-latexextra`
 - `collection-latexrecommended`
 - `collection-luatex`
 - `collection-langjapanese`
 - `collection-mathscience`
 - `collection-pictures`
-- `tikz` (v0.6.0~)
 - `latexmk`
 - `latexdiff`
 - `stix2-otf` (v0.5.0~)

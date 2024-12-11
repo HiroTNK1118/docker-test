@@ -1,4 +1,4 @@
-name: Build and Release "docker-test"
+name: Build and Push "docker-test" Images
 
 on:
   push:
@@ -14,7 +14,7 @@ env:
 
 jobs:
   build-and-push:
-    runs-on: TEXLIVE-latest
+    runs-on: ubuntu-latest
 
     # イメージの対象アーキテクチャを指定
     strategy:

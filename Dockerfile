@@ -25,15 +25,15 @@ RUN apt-get update && \
     libfreetype6-dev \
     ghostscript \
     perl \
-    perl-modules \
+    perl-doc \
     cpanminus \
     git \
     less \
     unzip \
     poppler-utils \
     software-properties-common && \
-    # install "GCString" module with cpanm
-    cpanm --notest Unicode::GCString && \
+    # install perl module for latexindent
+    cpanm --notest Unicode::GCString YAML::Tiny File::Homedir && \
     # install "pygments" for minted
     pip3 install --no-cache-dir pygments && \
     # add repository for Node.js & Inkscape
@@ -92,7 +92,6 @@ RUN tlmgr update --repository ${TEXLIVE_MIRROR} --self --all && \
         collection-langjapanese \
         collection-mathscience \
         collection-pictures \
-        tikz \
         latexmk \
         latexdiff \
         stix2-otf \

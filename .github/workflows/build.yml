@@ -1,4 +1,4 @@
-name: Build and Push Docker Image
+name: Build and Release "docker-test"
 
 on:
   push:
@@ -9,14 +9,19 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: docker-test
-  UBUNTU_VER: 24
   TEXLIVE_VER: 24
-  IMAGE_REV: 0
-  ARCHS: linux/amd64, linux/arm64
+  IMAGE_VER: 0
 
 jobs:
   build-and-push:
-    runs-on: ubuntu-latest
+    runs-on: TEXLIVE-latest
+
+    # イメージの対象アーキテクチャを指定
+    strategy:
+      matrix:
+        arch:
+          - amd64
+          - arm64
 
     # イメージをプッシュする権限をGITHUB_TOKENに付与
     permissions:
@@ -27,6 +32,15 @@ jobs:
       # GitHubリポジトリをチェックアウト
       - name: Checkout repository
         uses: actions/checkout@v3
+
+      # イメージタグの生成
+      - name: create image tag
+        run: |
+          REV=0
+          while git show-ref --tags | grep -q "refs/tags/${{ env.TEXLIVE_VER }}.${{ env.IMAGE_VER }}.${REV}"; do
+          REV=$((REV+1))
+          done
+          echo "IMAGE_TAG=${{ env.TEXLIVE_VER }}.${REV}" >> $GITHUB_ENV
 
       # ghcr.ioにログイン
       - name: Log in to GitHub Container Registry
@@ -40,13 +54,11 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
         with:
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/${{ matrix.arch }}
       
       # Docker Buildxのセットアップ
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-        with:
-          install: true  # Buildxをインストール
 
       # メタデータを生成（latestタグを追加）
       - name: Extract metadata for Docker image
@@ -55,8 +67,8 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}
           tags: |
-            type=raw,value=${{ env.UBUNTU_VER }}.${{ env.TEXLIVE_VER }}.${{ env.IMAGE_REV }}  # ブランチベースのタグ
-            type=raw,value=latest  # mainブランチにpushされた場合にlatestタグを付与
+            type=raw,value=latest-${{ matrix.arch }} # mainブランチにpushされた場合にlatestタグを付与
+            type=raw,value=${{ env.IMAGE_TAG }}-${{ matrix.arch }}  # ブランチベースのタグ
 
       # Dockerイメージをビルドしてghcr.ioにプッシュ
       - name: Build and push Docker image
@@ -66,13 +78,33 @@ jobs:
           file: ./Dockerfile
           push: true
           # 対応するアーキテクチャを指定
-          platforms: ${{ env.ARCHS }}
+          platforms: linux/${{ matrix.arch }}
           # イメージタグを指定
           tags: ${{ steps.meta.outputs.tags }}
           # キャッシュの利用
           cache-from: type=gha
           cache-to: type=gha, mode=max
+  
+  # release-to-github:
+  #   needs: build-and-push
+  #   runs-on: ubuntu-latest
+  #   # リリースをプッシュする権限をGITHUB_TOKENに付与
+  #   permissions:
+  #     contents: write  # releaseをpushする権限
 
-      # キャッシュをクリア（オプション、サイズ削減のため）
-      # - name: Clean up Docker cache
-      #   run: docker builder prune -f
+  #   steps:
+  #     # GitHubリポジトリをチェックアウト
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v3
+
+  #     # GitHubリポジトリにリリースを作成
+  #     - name: Create GitHub Release
+  #       uses: actions/create-release@v1
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #       with:
+  #         tag_name: ${{ env.IMAGE_TAG }}
+  #         release_name: docker-test-base ${{ env.IMAGE_TAG }}
+  #         body: |
+  #           ## リリースノート
+  #           自動生成されたリリースです

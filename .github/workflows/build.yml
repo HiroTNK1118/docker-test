@@ -16,6 +16,7 @@ jobs:
   build:
     name: Build Docker image
     runs-on: ubuntu-latest
+    timeout-minutes: 720
 
     # イメージをプッシュする権限をGITHUB_TOKENに付与
     permissions:

@@ -1,31 +1,40 @@
 name: Build and Push "docker-test" Images
 
 on:
+  workflow_dispatch:  # 手動のActionsトリガー
   push:
     branches:
       - main  # mainブランチにpushされたときに実行
-  workflow_dispatch:  # 手動のActionsトリガー
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: docker-test
   TEXLIVE_VER: 24
   IMAGE_VER: 0
-  ARCHS: linux/amd64, linux/arm64
 
 jobs:
-  build-and-push:
+  build:
+    name: Build Docker image
     runs-on: ubuntu-latest
 
     # イメージをプッシュする権限をGITHUB_TOKENに付与
     permissions:
       contents: read  # コードを読み取る権限
       packages: write  # ghcr.ioにパッケージをpushする権限
+    
+    # アーキテクチャごとにジョブを分割
+    strategy:
+      matrix:
+        arch:
+          - amd64
+          - arm64
 
     steps:
       # GitHubリポジトリをチェックアウト
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: -1
 
       # イメージタグの生成
       - name: create image tag
@@ -48,7 +57,7 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
         with:
-          platforms: ${{ env.ARCHS }}
+          platforms: linux/${{ matrix.arch }}
       
       # Docker Buildxのセットアップ
       - name: Set up Docker Buildx
@@ -61,8 +70,8 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}
           tags: |
-            type=raw,value=latest # mainブランチにpushされた場合にlatestタグを付与
-            type=raw,value=${{ env.IMAGE_TAG }}  # ブランチベースのタグ
+            type=raw,value=latest-${{ matrix.arch }} # mainブランチにpushされた場合にlatestタグを付与
+            type=raw,value=${{ env.IMAGE_TAG }}-${{ matrix.arch }}  # ブランチベースのタグ
 
       # Dockerイメージをビルドしてghcr.ioにプッシュ
       - name: Build and push Docker image
@@ -72,16 +81,20 @@ jobs:
           file: ./Dockerfile
           push: true
           # 対応するアーキテクチャを指定
-          platforms: ${{ env.ARCHS }}
+          platforms: linux/${{ matrix.arch }}
           # イメージタグを指定
           tags: ${{ steps.meta.outputs.tags }}
           # キャッシュの利用
           cache-from: type=gha
           cache-to: type=gha, mode=max
+          build-args: |
+            TARGETPLATFORM=linux/${{ matrix.arch }}
 
   release-to-github:
-    needs: build-and-push
+    needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       # GitHubリポジトリをチェックアウト
       - name: Checkout repository
@@ -117,3 +130,32 @@ jobs:
             ## Changed
             ## Fixed
           draft: true
+
+  create-manifest:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      # ghcr.ioにログイン
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # マニフェストを生成してプッシュ
+      - name: Create and push Docker manifest
+        uses: Noelware/docker-manifest-action@master
+        with:
+          inputs: |
+            ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:latest
+            ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+          images: |
+            ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:latest-amd64
+            ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:latest-arm64
+            ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}-amd64
+            ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}-arm64
+      

@@ -32,8 +32,7 @@ RUN mkdir /tmp/install-tl-unx && \
 #----------
 # install LaTeX collections & packages with tlmgr
 #----------
-RUN tlmgr update --repository ${TEXLIVE_MIRROR} --self --all --verify-repo=none && \
-    tlmgr --repository ${TEXLIVE_MIRROR} install \
+RUN tlmgr --repository ${TEXLIVE_MIRROR} install \
         collection-bibtexextra \
         collection-latexextra \
         collection-latexrecommended \

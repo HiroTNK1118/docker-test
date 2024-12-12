@@ -14,16 +14,16 @@ ENV LC_ALL=C
 #----------
 # define TeXLive version and CTAN mirror
 ARG TEXLIVE_VERSION=2024
-# ARG TEXLIVE_MIRROR="https://mirror.ctan.org/systems/texlive/tlnet/"
 ARG TEXLIVE_MIRROR="https://tug.ctan.org/systems/texlive/tlnet/"
+# ARG TEXLIVE_MIRROR="https://mirror.ctan.org/systems/texlive/tlnet/"
 
 # install TeXLive from CTAN mirror
 RUN mkdir /tmp/install-tl-unx && \
-    curl -L ${TEXLIVE_MIRROR}/install-tl-unx.tar.gz | tar -xzv -C /tmp/install-tl-unx --strip-components=1 && \
+    curl -L ${TEXLIVE_MIRROR}install-tl-unx.tar.gz | tar -xzv -C /tmp/install-tl-unx --strip-components=1 && \
     /bin/echo -e 'selected_scheme scheme-basic\ntlpdbopt_install_docfiles 0\ntlpdbopt_install_srcfiles 0' \
         > /tmp/install-tl-unx/texlive.profile && \
     /tmp/install-tl-unx/install-tl \
-        --repository ${TEXLIVE_MIRROR}/ \
+        --repository ${TEXLIVE_MIRROR} \
         -profile /tmp/install-tl-unx/texlive.profile && \
     rm -r /tmp/install-tl-unx && \
     ln -sf /usr/local/texlive/${TEXLIVE_VERSION}/bin/$(uname -m)-linux /usr/local/texlive/bin

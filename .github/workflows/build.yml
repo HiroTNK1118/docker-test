@@ -5,6 +5,9 @@ on:
   push:
     branches:
       - main  # mainブランチにpushされたときに実行
+    paths:
+      - 'Dockerfile'
+      - '.github/workflows/build.yml'
 
 env:
   REGISTRY: ghcr.io

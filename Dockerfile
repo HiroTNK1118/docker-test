@@ -32,7 +32,8 @@ RUN mkdir /tmp/install-tl-unx && \
 #----------
 # install LaTeX collections & packages with tlmgr
 #----------
-RUN tlmgr --repository ${TEXLIVE_MIRROR} install \
+RUN tlmgr update --self --all && \
+    tlmgr install \
         # collection-bibtexextra \
         collection-latexextra \
         collection-latexrecommended \
@@ -59,5 +60,6 @@ RUN	curl -L -O https://raw.githubusercontent.com/being24/latex-docker/master/cre
 #----------
 # set user and working directry
 #----------
+RUN useradd -m -s /bin/bash latex
 USER latex
 WORKDIR /workdir

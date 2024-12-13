@@ -44,7 +44,7 @@ jobs:
           while git show-ref --tags | grep -q "refs/tags/${{ env.TEXLIVE_VER }}.${{ env.IMAGE_VER }}.${REV}"; do
           REV=$((REV+1))
           done
-          echo "IMAGE_TAG=${{ env.TEXLIVE_VER }}.${REV}" >> $GITHUB_ENV
+          echo "IMAGE_TAG=${{ env.TEXLIVE_VER }}.${REV}" >> $GITHUB_OUTPUT
 
       # ghcr.ioにログイン
       - name: Log in to GitHub Container Registry
@@ -103,14 +103,14 @@ jobs:
         with:
           fetch-depth: -1
 
-      # イメージタグの生成
-      - name: create image tag
-        run: |
-          REV=0
-          while git show-ref --tags | grep -q "refs/tags/${{ env.TEXLIVE_VER }}.${{ env.IMAGE_VER }}.${REV}"; do
-          REV=$((REV+1))
-          done
-          echo "RELEASE_TAG=${{ env.TEXLIVE_VER }}.${{ env.IMAGE_VER }}.${REV}" >> $GITHUB_ENV
+      # # イメージタグの生成
+      # - name: create image tag
+      #   run: |
+      #     REV=0
+      #     while git show-ref --tags | grep -q "refs/tags/${{ env.TEXLIVE_VER }}.${{ env.IMAGE_VER }}.${REV}"; do
+      #     REV=$((REV+1))
+      #     done
+      #     echo "RELEASE_TAG=${{ env.TEXLIVE_VER }}.${{ env.IMAGE_VER }}.${REV}" >> $GITHUB_ENV
 
       # リリース日の取得
       - name: Set current day of month as env variable
@@ -124,8 +124,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ env.RELEASE_TAG }}
-          release_name: docker-test ${{ env.RELEASE_TAG }} (${{ env.DATE }})
+          tag_name: ${{ env.IMAGE_TAG }}
+          release_name: docker-test ${{ env.IMAGE_TAG }} (${{ env.DATE }})
           body: |
             ## Added
             ## Changed

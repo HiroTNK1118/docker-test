@@ -31,7 +31,7 @@ jobs:
       matrix:
         arch:
           - amd64
-          # - arm64
+          - arm64
 
     steps:
       # GitHubリポジトリをチェックアウト
@@ -92,8 +92,8 @@ jobs:
           # イメージタグを指定
           tags: ${{ steps.meta.outputs.tags }}
           # キャッシュの利用
-          cache-from: type=gha
-          cache-to: type=gha, mode=max
+          cache-from: type=gha,scope=docker-test-${{ matrix.arch }}
+          cache-to: type=gha,mode=max,scope=docker-test-${{ matrix.arch }}
           provenance: false
 
   create-manifest:
@@ -131,9 +131,7 @@ jobs:
         uses: Noelware/docker-manifest-action@master
         with:
           inputs: ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:latest, ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
-          # images: ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:latest-amd64, ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:latest-arm64
-          images: ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:latest-amd64
-                
+          images: ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:latest-amd64, ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:latest-arm64
 
   release-to-github:
     needs: create-manifest

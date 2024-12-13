@@ -10,7 +10,7 @@ TeX LiveをDocker上で動かすためのコンテナビルド用リポジトリ
 | 0.4.0  | 2024/10/8  | 22.04  |  2024   | amd64, arm64 | [ghcr.io](https://github.com/HiroTNK1118/docker-test/pkgs/container/docker-test/285739845?tag=0.4.0) |
 | 0.5.0  | 2024/11/10 | 22.04  |  2024   | amd64, arm64 | [ghcr.io](https://github.com/HiroTNK1118/docker-test/pkgs/container/docker-test/303239648?tag=0.5.0) |
 | 24.0.0 | 2024/12/13 | 24.04  |  2024   |    amd64     | [ghcr.io]()                                                                                          |
-| 24.0.1 | 2024/12/13           | 24.04       | 2024        | amd64, arm64             |                                                                                                      |
+<!-- | 24.0.1 | 2024/12/13           | 24.04       | 2024        | amd64, arm64             |                                                                                                      | -->
 
 ※24.0.0以降よりバージョン命名法を「texliveのバージョン.イメージのバージョン.リビジョン番号」に変更しました
 

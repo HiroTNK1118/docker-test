@@ -58,6 +58,15 @@ RUN	curl -L -O https://raw.githubusercontent.com/being24/latex-docker/master/cre
 
 
 #----------
+# install tex-fmt
+#----------
+RUN curl -L -o tex-fmt.tar.gz https://github.com/WGUNDERWOOD/tex-fmt/releases/latest/download/tex-fmt-$(uname -m)-linux.tar.gz && \
+    tar -xzvf tex-fmt.tar.gz && \
+    mv tex-fmt /usr/local/bin && \
+    rm tex-fmt.tar.gz
+
+
+#----------
 # set user and working directry
 #----------
 RUN useradd -m -s /bin/bash latex

@@ -17,7 +17,7 @@ env:
 
 jobs:
   build:
-    name: Build Docker image
+    name: Build image and Publish to GHCR
     runs-on: ubuntu-latest
     timeout-minutes: 720
 
@@ -98,7 +98,8 @@ jobs:
           cache-to: type=gha,mode=max,scope=docker-test-${{ matrix.arch }}
           provenance: false
 
-  create-manifest:
+  manifest:
+    name: Publish latest image
     needs: build
     runs-on: ubuntu-latest
     permissions:
@@ -135,8 +136,9 @@ jobs:
           inputs: ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:latest, ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
           images: ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:latest-amd64, ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:latest-arm64
 
-  release-to-github:
-    needs: create-manifest
+  release:
+    name: Publish release to GitHub
+    needs: manifest
     runs-on: ubuntu-latest
     permissions:
       contents: write

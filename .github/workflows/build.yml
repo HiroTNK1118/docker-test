@@ -76,9 +76,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}
-          tags: |
-            type=raw,value=latest-${{ matrix.arch }} # mainブランチにpushされた場合にlatestタグを付与
-            type=raw,value=${{ env.IMAGE_TAG }}-${{ matrix.arch }}  # ブランチベースのタグ
+          tags: type=raw,value=${{ env.IMAGE_TAG }}-${{ matrix.arch }}  # ブランチベースのタグ
 
       # Dockerイメージをビルドしてghcr.ioにプッシュ
       - name: Build and push Docker image
@@ -133,8 +131,10 @@ jobs:
       - name: Create and push Docker manifest
         uses: Noelware/docker-manifest-action@master
         with:
-          inputs: ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:latest, ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
-          images: ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:latest-amd64, ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:latest-arm64
+          inputs: ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:latest,${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+          images: ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}-amd64,${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}-arm64
+          push: true
+          amend: true
 
   release:
     name: Publish release to GitHub

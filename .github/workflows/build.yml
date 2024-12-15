@@ -80,7 +80,7 @@ jobs:
 
       # Dockerイメージをビルドしてghcr.ioにプッシュ
       - name: Build and push Docker image
-        timeout-minutes: ${{ matrix.build-time }}
+        # timeout-minutes: ${{ matrix.build-time }}
         uses: docker/build-push-action@v5
         with:
           builder: ${{ steps.buildx.outputs.name }}

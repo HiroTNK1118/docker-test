@@ -92,8 +92,10 @@ jobs:
           # イメージタグを指定
           tags: ${{ steps.meta.outputs.tags }}
           # キャッシュの利用
-          cache-from: type=gha,scope=docker-test-${{ env.ARCH }}
-          cache-to: type=gha,mode=max,scope=docker-test-${{ env.ARCH }}
+          # cache-from: type=gha,scope=docker-test-${{ env.ARCH }}
+          # cache-to: type=gha,mode=max,scope=docker-test-${{ env.ARCH }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           provenance: false
 
   manifest:

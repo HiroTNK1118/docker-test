@@ -30,7 +30,7 @@ RUN mkdir /tmp/install-tl-unx && \
 
 
 #----------
-# install LaTeX collections & packages with tlmgr
+# install TeX Live packages and others
 #----------
 RUN tlmgr update --self --all && \
     tlmgr install \
@@ -45,30 +45,24 @@ RUN tlmgr update --self --all && \
         latexdiff \
         stix2-otf \
         latexindent && \
-    mktexlsr
-
-
-#----------
+    mktexlsr && \
 # install create_font_cache.sh
-#----------
-RUN	curl -L -O https://raw.githubusercontent.com/being24/latex-docker/master/create_font_cache.sh && \
+	curl -L -O https://raw.githubusercontent.com/being24/latex-docker/master/create_font_cache.sh && \
     chmod +x create_font_cache.sh && \
     ./create_font_cache.sh && \
-    rm create_font_cache.sh
-
-
-#----------
+    rm create_font_cache.sh && \
 # install tex-fmt
-#----------
-RUN curl -L -o tex-fmt.tar.gz https://github.com/WGUNDERWOOD/tex-fmt/releases/latest/download/tex-fmt-$(uname -m)-linux.tar.gz && \
+    curl -L -o tex-fmt.tar.gz https://github.com/WGUNDERWOOD/tex-fmt/releases/latest/download/tex-fmt-$(uname -m)-linux.tar.gz && \
     tar -xzvf tex-fmt.tar.gz && \
     mv tex-fmt /usr/local/bin && \
-    rm tex-fmt.tar.gz
+    rm tex-fmt.tar.gz && \
+    # add user "latex"
+    useradd -m -s /bin/bash latex && \
+    chown -R latex:latex /usr/local/texlive
 
 
 #----------
 # set user and working directry
 #----------
-RUN useradd -m -s /bin/bash latex
 USER latex
 WORKDIR /workdir

@@ -34,7 +34,7 @@ RUN mkdir /tmp/install-tl-unx && \
 #----------
 RUN tlmgr update --self --all && \
     tlmgr install \
-        # collection-bibtexextra \
+        collection-bibtexextra \
         collection-latexextra \
         collection-latexrecommended \
         collection-luatex \

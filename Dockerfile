@@ -20,11 +20,10 @@ ARG TEXLIVE_MIRROR="https://mirror.ctan.org/systems/texlive/tlnet"
 # install TeXLive from CTAN mirror
 RUN mkdir /tmp/install-tl-unx && \
     curl -L ${TEXLIVE_MIRROR}/install-tl-unx.tar.gz | tar -xzv -C /tmp/install-tl-unx --strip-components=1 && \
-    /bin/echo -e 'selected_scheme scheme-basic\ntlpdbopt_install_docfiles 0\ntlpdbopt_install_srcfiles 0' \
-        > /tmp/install-tl-unx/texlive.profile && \
-    /tmp/install-tl-unx/install-tl \
-        --repository ${TEXLIVE_MIRROR} \
-        -profile /tmp/install-tl-unx/texlive.profile && \
+    /bin/echo -e \
+    'selected_scheme scheme-basic\ntlpdbopt_install_docfiles 0\ntlpdbopt_install_srcfiles 0' \
+    > /tmp/install-tl-unx/texlive.profile && \
+    /tmp/install-tl-unx/install-tl --repository ${TEXLIVE_MIRROR} -profile /tmp/install-tl-unx/texlive.profile && \
     rm -r /tmp/install-tl-unx && \
     ln -sf /usr/local/texlive/${TEXLIVE_VERSION}/bin/$(uname -m)-linux /usr/local/texlive/bin
 
@@ -34,24 +33,24 @@ RUN mkdir /tmp/install-tl-unx && \
 #----------
 RUN tlmgr update --self --all && \
     tlmgr install \
-        collection-bibtexextra \
-        collection-latexextra \
-        collection-latexrecommended \
-        collection-luatex \
-        collection-langjapanese \
-        collection-mathscience \
-        collection-pictures \
-        latexmk \
-        latexdiff \
-        stix2-otf \
-        latexindent && \
+    collection-bibtexextra \
+    collection-latexextra \
+    collection-latexrecommended \
+    collection-luatex \
+    collection-langjapanese \
+    collection-mathscience \
+    collection-pictures \
+    latexmk \
+    latexdiff \
+    stix2-otf \
+    latexindent && \
     mktexlsr && \
-# install create_font_cache.sh
-	curl -L -O https://raw.githubusercontent.com/being24/latex-docker/master/create_font_cache.sh && \
+    # install create_font_cache.sh
+    curl -L -O https://raw.githubusercontent.com/being24/latex-docker/master/create_font_cache.sh && \
     chmod +x create_font_cache.sh && \
     ./create_font_cache.sh && \
     rm create_font_cache.sh && \
-# install tex-fmt
+    # install tex-fmt
     curl -L -o tex-fmt.tar.gz https://github.com/WGUNDERWOOD/tex-fmt/releases/latest/download/tex-fmt-$(uname -m)-linux.tar.gz && \
     tar -xzvf tex-fmt.tar.gz && \
     mv tex-fmt /usr/local/bin && \

@@ -19,7 +19,7 @@ env:
 jobs:
   build:
     name: Build image and Publish to GHCR
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     # イメージをプッシュする権限をGITHUB_TOKENに付与
     permissions:

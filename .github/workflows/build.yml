@@ -197,7 +197,7 @@ jobs:
           git tag ${{ needs.tag.outputs.tag }}
           git push origin ${{ needs.tag.outputs.tag }}
 
-      # リリースを作成
+      # リリースを作成しアップロード
       - name: Create GitHub Release
         env:
           TZ: 'Asia/Tokyo' # タイムゾーン指定
@@ -207,18 +207,5 @@ jobs:
             --title "docker-test ${{ needs.tag.outputs.tag }} ($(date +'%Y/%m/%d'))" \
             --notes-from-tag ${{ needs.tag.outputs.prevtag }} \
             --draft
+          gh release upload ${{ needs.tag.outputs.tag }}
 
-      # アーカイブファイルの作成
-      - name: Create archive
-        run: |
-          zip -r ${{ needs.tag.outputs.tag }}.zip .
-          tar czvf ${{ needs.tag.outputs.tag }}.tar.gz .
-
-      # リリースアセットのアップロード
-      - name: Upload Release Assets
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release upload ${{ needs.tag.outputs.tag }} \
-            ${{ needs.tag.outputs.tag }}.zip \
-            ${{ needs.tag.outputs.tag }}.tar.gz

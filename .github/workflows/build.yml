@@ -148,6 +148,7 @@ jobs:
           inputs: ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:latest,${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:${{ needs.tag.outputs.tag }}
           images: ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:${{ needs.tag.outputs.tag }}-amd64,${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:${{ needs.tag.outputs.tag }}-arm64
           push: true
+          amend: true
 
   release:
     name: Publish release to GitHub
@@ -176,5 +177,5 @@ jobs:
         run: |
           gh release create ${{ needs.tag.outputs.tag }} \
             --title "docker-test ${{ needs.tag.outputs.tag }} ($(date +'%Y/%m/%d'))" \
-            --notes-from-tag ${{ needs.tag.outputs.prevtag }} \
+            --generate-notes \
             --draft

@@ -193,6 +193,7 @@ jobs:
       - name: Create GitHub Release
         env:
           TZ: 'Asia/Tokyo' # タイムゾーン指定
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release create ${{ needs.tag.outputs.tag }} \
             --title "docker-test ${{ needs.tag.outputs.tag }} ($(date +'%Y/%m/%d'))" \
@@ -207,6 +208,8 @@ jobs:
 
       # リリースアセットのアップロード
       - name: Upload Release Assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release upload ${{ needs.tag.outputs.tag }} \
             ${{ needs.tag.outputs.tag }}.zip \

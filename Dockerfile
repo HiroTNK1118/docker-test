@@ -54,9 +54,10 @@ RUN tlmgr install --repository ${TEXLIVE_MIRROR} \
     tar -xzvf tex-fmt.tar.gz && \
     mv tex-fmt /usr/local/bin && \
     rm tex-fmt.tar.gz && \
-    # add user "latex"
+    # add user "latex" and set permissions
     useradd -m -s /bin/bash latex && \
-    chown -R latex:latex /usr/local/texlive
+    chown -R latex:latex /usr/local/texlive && \
+    chmod u+w /usr/local/texlive
 
 
 #----------

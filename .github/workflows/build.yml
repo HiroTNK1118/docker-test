@@ -53,15 +53,12 @@ jobs:
             runner: ubuntu-latest
           - arch: arm64
             runner: self-hosted
-
     # アーキテクチャごとランナーを分ける        
     runs-on: ${{ matrix.runner }}
-
-    # イメージをプッシュする権限をGITHUB_TOKENに付与
+    # イメージをプッシュする権限を付与
     permissions:
       contents: read  # コードを読み取る権限
       packages: write  # ghcr.ioにパッケージをpushする権限
-
     steps:
       # GitHubリポジトリをチェックアウト
       - name: Checkout repository
@@ -168,9 +165,10 @@ jobs:
 
       # リリース日の取得
       - name: Set current day of month as env variable
+        id: date
         env:
           TZ: 'Asia/Tokyo' # タイムゾーン指定
-        run: echo "DATE=$(date +'%Y/%m/%d')" >> $GITHUB_ENV
+        run: echo "DATE=$(date +'%Y/%m/%d')" >> "$GITHUB_OUTPUT"
   
       # GitHubリポジトリにリリースを作成
       - name: Create GitHub Release
@@ -179,7 +177,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ needs.tag.outputs.tag }}
-          release_name: docker-test ${{ needs.tag.outputs.tag }} (${{ env.DATE }})
+          release_name: docker-test ${{ needs.tag.outputs.tag }} (${{ steps.date.outputs.DATE }})
           body: |
             ## Added
             ## Changed

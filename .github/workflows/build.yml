@@ -26,6 +26,7 @@ jobs:
     # イメージタグを後続のjobに渡すoutputs
     outputs:
       tag: ${{ steps.tag.outputs.TAG }}
+      prevtag: ${{ steps.tag.outputs.PREVTAG }}
     steps:
       # GitHubリポジトリをチェックアウト
       - name: Checkout repository
@@ -35,12 +36,21 @@ jobs:
       # イメージタグの生成
       - name: create tag
         id: tag
+        # run: |
+        #   REV=0
+        #   while git show-ref --tags | grep -q "refs/tags/${{ env.TEXLIVE_VER }}.${{ env.IMAGE_VER }}.${REV}"; do
+        #   REV=$((REV+1))
+        #   done
+        #   echo "TAG=${{ env.TEXLIVE_VER }}.${{ env.IMAGE_VER }}.${REV}" >> "$GITHUB_OUTPUT"
         run: |
-          REV=0
-          while git show-ref --tags | grep -q "refs/tags/${{ env.TEXLIVE_VER }}.${{ env.IMAGE_VER }}.${REV}"; do
-          REV=$((REV+1))
-          done
-          echo "TAG=${{ env.TEXLIVE_VER }}.${{ env.IMAGE_VER }}.${REV}" >> "$GITHUB_OUTPUT"
+          patch=0
+          PREVTAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.0.0")
+          IFS='.' read -r major minor patch <<< "$PREVTAG"
+          if [[ "$major" == "${{ env.TEXLIVE_VER }}" && "$minor" == "${{ env.IMAGE_VER }}" ]]; then
+            patch=$((patch + 1))
+          fi
+          echo "PREVTAG=$PREV_TAG" >> "$GITHUB_OUTPUT"
+          echo "TAG=${{ env.TEXLIVE_VER }}.${{ env.IMAGE_VER }}.${patch}" >> "$GITHUB_OUTPUT"
     
   build:
     name: Build image and Publish to GHCR

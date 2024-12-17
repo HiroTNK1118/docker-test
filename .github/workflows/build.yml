@@ -151,14 +151,9 @@ jobs:
       - name: Create and push Docker manifest
         uses: Noelware/docker-manifest-action@master
         with:
-          inputs: |
-            ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:latest
-            ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:${{ needs.tag.outputs.tag }}
-          images: |
-            ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:${{ needs.tag.outputs.tag }}-amd64
-            ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:${{ needs.tag.outputs.tag }}-arm64
+          inputs: ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:latest,${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:${{ needs.tag.outputs.tag }}
+          images: ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:${{ needs.tag.outputs.tag }}-amd64,${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:${{ needs.tag.outputs.tag }}-arm64
           push: true
-          amend: true
 
   release:
     name: Publish release to GitHub

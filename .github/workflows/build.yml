@@ -168,24 +168,46 @@ jobs:
         with:
           fetch-depth: -1
 
-      # リリース日の取得
-      - name: Set current day of month as env variable
-        id: date
+      # # リリース日の取得
+      # - name: Set current day of month as env variable
+      #   id: date
+      #   env:
+      #     TZ: 'Asia/Tokyo' # タイムゾーン指定
+      #   run: echo "DATE=$(date +'%Y/%m/%d')" >> "$GITHUB_OUTPUT"
+  
+      # # GitHubリポジトリにリリースを作成
+      # - name: Create GitHub Release
+      #   uses: actions/create-release@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     tag_name: ${{ needs.tag.outputs.tag }}
+      #     release_name: docker-test ${{ needs.tag.outputs.tag }} (${{ steps.date.outputs.DATE }})
+      #     body: |
+      #       ## Added
+      #       ## Changed
+      #       ## Fixed
+      #     draft: true
+
+      # リリースを作成
+      - name: Create GitHub Release
         env:
           TZ: 'Asia/Tokyo' # タイムゾーン指定
-        run: echo "DATE=$(date +'%Y/%m/%d')" >> "$GITHUB_OUTPUT"
-  
-      # GitHubリポジトリにリリースを作成
-      - name: Create GitHub Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ needs.tag.outputs.tag }}
-          release_name: docker-test ${{ needs.tag.outputs.tag }} (${{ steps.date.outputs.DATE }})
-          body: |
-            ## Added
-            ## Changed
-            ## Fixed
-          draft: true
-      
+        run: |
+          gh release create ${{ needs.tag.outputs.tag }} \
+            --title "docker-test ${{ needs.tag.outputs.tag }} ($(date +'%Y/%m/%d'))" \
+            --notes-from-tag ${{ needs.tag.outputs.prevtag }} \
+            --draft
+
+      # アーカイブファイルの作成
+      - name: Create archive
+        run: |
+          zip -r ${{ needs.tag.outputs.tag }}.zip .
+          tar ${{ needs.tag.outputs.tag }}.tar.gz .
+
+      # リリースアセットのアップロード
+      - name: Upload Release Assets
+        run: |
+          gh release upload ${{ needs.tag.outputs.tag }} \
+            ${{ needs.tag.outputs.tag }}.zip \
+            ${{ needs.tag.outputs.tag }}.tar.gz

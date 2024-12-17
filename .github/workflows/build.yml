@@ -17,9 +17,34 @@ env:
   # ARCH: amd64,arm64
 
 jobs:
+  tag:
+    name: Create Image/Release tag
+    runs-on: ubuntu-latest
+    # リポジトリを参照する権限を付与
+    permissions:
+      contents: read
+    # イメージタグを後続のjobに渡すoutputs
+    outputs:
+      tag: ${{ steps.tag.outputs.TAG }}
+    steps:
+      # GitHubリポジトリをチェックアウト
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: -1
+      # イメージタグの生成
+      - name: create tag
+        id: tag
+        run: |
+          REV=0
+          while git show-ref --tags | grep -q "refs/tags/${{ env.TEXLIVE_VER }}.${{ env.IMAGE_VER }}.${REV}"; do
+          REV=$((REV+1))
+          done
+          echo "TAG=${{ env.TEXLIVE_VER }}.${{ env.IMAGE_VER }}.${REV}" >> "$GITHUB_OUTPUT"
+    
   build:
     name: Build image and Publish to GHCR
-    
+    needs: tag
     # アーキテクチャごとにジョブを分割
     strategy:
       matrix:
@@ -43,15 +68,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: -1
-
-      # イメージタグの生成
-      - name: create image tag
-        run: |
-          REV=0
-          while git show-ref --tags | grep -q "refs/tags/${{ env.TEXLIVE_VER }}.${{ env.IMAGE_VER }}.${REV}"; do
-          REV=$((REV+1))
-          done
-          echo "IMAGE_TAG=${{ env.TEXLIVE_VER }}.${{ env.IMAGE_VER }}.${REV}" >> $GITHUB_ENV
 
       # ghcr.ioにログイン
       - name: Log in to GitHub Container Registry
@@ -78,7 +94,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}
-          tags: type=raw,value=${{ env.IMAGE_TAG }}-${{ matrix.arch }}  # ブランチベースのタグ
+          tags: type=raw,value=${{ needs.tag.outputs.tag }}-${{ matrix.arch }}
 
       # Dockerイメージをビルドしてghcr.ioにプッシュ
       - name: Build and push Docker image
@@ -102,7 +118,9 @@ jobs:
 
   manifest:
     name: Publish latest image
-    needs: build
+    needs:
+      - build
+      - tag
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -113,15 +131,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: -1
-
-      # イメージタグの生成
-      - name: create image tag
-        run: |
-          REV=0
-          while git show-ref --tags | grep -q "refs/tags/${{ env.TEXLIVE_VER }}.${{ env.IMAGE_VER }}.${REV}"; do
-          REV=$((REV+1))
-          done
-          echo "IMAGE_TAG=${{ env.TEXLIVE_VER }}.${{ env.IMAGE_VER }}.${REV}" >> $GITHUB_ENV
       
       # ghcr.ioにログイン
       - name: Log in to GitHub Container Registry
@@ -135,14 +144,18 @@ jobs:
       - name: Create and push Docker manifest
         uses: Noelware/docker-manifest-action@master
         with:
-          inputs: ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:latest,${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
-          images: ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}-amd64,${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}-arm64
+          inputs: |
+            ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:latest
+            ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:${{ needs.tag.outputs.tag }}
+          images: |
+            ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:${{ needs.tag.outputs.tag }}-amd64
+            ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}:${{ needs.tag.outputs.tag }}-arm64
           push: true
           amend: true
 
   release:
     name: Publish release to GitHub
-    needs: manifest
+    needs: tag
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -152,15 +165,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: -1
-
-      # リリースタグの生成
-      - name: create release tag
-        run: |
-          REV=0
-          while git show-ref --tags | grep -q "refs/tags/${{ env.TEXLIVE_VER }}.${{ env.IMAGE_VER }}.${REV}"; do
-          REV=$((REV+1))
-          done
-          echo "RELEASE_TAG=${{ env.TEXLIVE_VER }}.${{ env.IMAGE_VER }}.${REV}" >> $GITHUB_ENV
 
       # リリース日の取得
       - name: Set current day of month as env variable
@@ -174,8 +178,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ env.RELEASE_TAG }}
-          release_name: docker-test ${{ env.RELEASE_TAG }} (${{ env.DATE }})
+          tag_name: ${{ needs.tag.outputs.tag }}
+          release_name: docker-test ${{ needs.tag.outputs.tag }} (${{ env.DATE }})
           body: |
             ## Added
             ## Changed

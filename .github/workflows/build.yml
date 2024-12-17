@@ -54,7 +54,9 @@ jobs:
     
   build:
     name: Build image and Publish to GHCR
-    needs: tag
+    needs: 
+      - tag
+      - release
     # アーキテクチャごとにジョブを分割
     strategy:
       matrix:
@@ -189,6 +191,12 @@ jobs:
       #       ## Fixed
       #     draft: true
 
+      # タグをプッシュ
+      - name: Create and Push Git tag
+        run: |
+          git tag ${{ needs.tag.outputs.tag }}
+          git push origin ${{ needs.tag.outputs.tag }}
+
       # リリースを作成
       - name: Create GitHub Release
         env:
@@ -204,7 +212,7 @@ jobs:
       - name: Create archive
         run: |
           zip -r ${{ needs.tag.outputs.tag }}.zip .
-          tar ${{ needs.tag.outputs.tag }}.tar.gz .
+          tar czvf ${{ needs.tag.outputs.tag }}.tar.gz .
 
       # リリースアセットのアップロード
       - name: Upload Release Assets

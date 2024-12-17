@@ -14,26 +14,28 @@ env:
   IMAGE_NAME: docker-test
   TEXLIVE_VER: 24
   IMAGE_VER: 1
-  ARCH: amd64,arm64
+  # ARCH: amd64,arm64
 
 jobs:
   build:
     name: Build image and Publish to GHCR
-    runs-on: self-hosted
+    
+    # アーキテクチャごとにジョブを分割
+    strategy:
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-latest
+          - arch: arm64
+            runner: self-hosted
+
+    # アーキテクチャごとランナーを分ける        
+    runs-on: ${{ matrix.runner }}
 
     # イメージをプッシュする権限をGITHUB_TOKENに付与
     permissions:
       contents: read  # コードを読み取る権限
       packages: write  # ghcr.ioにパッケージをpushする権限
-    
-    # # アーキテクチャごとにジョブを分割
-    # strategy:
-    #   matrix:
-    #     include:
-    #       - arch: amd64
-    #         build-time: 30
-    #       - arch: arm64
-    #         build-time: 480
 
     steps:
       # GitHubリポジトリをチェックアウト
@@ -63,7 +65,7 @@ jobs:
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
         with:
-          platforms: linux/${{ env.ARCH }}
+          platforms: linux/${{ matrix.arch }}
       
       # Docker Buildxのセットアップ
       - name: Set up Docker Buildx
@@ -76,7 +78,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/hirotnk1118/${{ env.IMAGE_NAME }}
-          tags: type=raw,value=${{ env.IMAGE_TAG }}-${{ env.ARCH }}  # ブランチベースのタグ
+          tags: type=raw,value=${{ env.IMAGE_TAG }}-${{ matrix.arch }}  # ブランチベースのタグ
 
       # Dockerイメージをビルドしてghcr.ioにプッシュ
       - name: Build and push Docker image
@@ -88,14 +90,14 @@ jobs:
           file: ./Dockerfile
           push: true
           # 対応するアーキテクチャを指定
-          platforms: linux/${{ env.ARCH }}
+          platforms: linux/${{ matrix.arch }}
           # イメージタグを指定
           tags: ${{ steps.meta.outputs.tags }}
           # キャッシュの利用
-          # cache-from: type=gha,scope=docker-test-${{ env.ARCH }}
-          # cache-to: type=gha,mode=max,scope=docker-test-${{ env.ARCH }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          # cache-from: type=gha
+          cache-from: type=gha,scope=docker-test-${{ matrix.arch }}
+          # cache-to: type=gha,mode=max
+          cache-to: type=gha,mode=max,scope=docker-test-${{ matrix.arch }}
           provenance: false
 
   manifest:

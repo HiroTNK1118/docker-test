@@ -13,7 +13,7 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: docker-test
   TEXLIVE_VER: 24
-  IMAGE_VER: 1
+  IMAGE_VER: 2
 
 jobs:
   tag:

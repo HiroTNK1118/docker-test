@@ -31,7 +31,7 @@ TeX LiveをDocker上で動かすためのコンテナビルド用リポジトリ
 
 ※`collection-__`に含まれるパッケージは[こちら](https://gist.github.com/nox40/6255eef548ccad9881ce7202e3bb75dd#file-collection-depends-md)を参照ください
 
-- `collection-bibtexextra`
+<!-- - `collection-bibtexextra` -->
 - `collection-latexextra`
 - `collection-latexrecommended`
 - `collection-luatex`

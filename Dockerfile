@@ -30,7 +30,7 @@ RUN mkdir /tmp/install-tl-unx && \
 # install TeX Live packages and others
 #----------
 RUN tlmgr install \
-    collection-bibtexextra \
+    # collection-bibtexextra \
     collection-latexextra \
     collection-latexrecommended \
     collection-luatex \

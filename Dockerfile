@@ -29,8 +29,7 @@ RUN mkdir /tmp/install-tl-unx && \
 #----------
 # install TeX Live packages and others
 #----------
-RUN tlmgr update --self --all && \
-    tlmgr install \
+RUN tlmgr install \
     collection-bibtexextra \
     collection-latexextra \
     collection-latexrecommended \

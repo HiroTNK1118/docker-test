@@ -27,7 +27,7 @@ TeX LiveをDocker上で動かすためのコンテナビルド用リポジトリ
 
 [卒論執筆テンプレートのリポジトリ](https://github.com/HiroTNK1118/latex-template-kanekolab)を参照ください
 
-## 収録される主なLaTeXパッケージ
+## 収録される主なLaTeXパッケージ (ver. 24.2.0)
 
 ※`collection-__`に含まれるパッケージは[こちら](https://gist.github.com/nox40/6255eef548ccad9881ce7202e3bb75dd#file-collection-depends-md)を参照ください
 

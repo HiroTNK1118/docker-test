@@ -1,7 +1,7 @@
 #----------
 # install base image (ghcr.io/hirotnk1118/docker-test-base)
 #----------
-FROM ghcr.io/hirotnk1118/docker-test-base:latest
+FROM ghcr.io/hirotnk1118/docker-test-base:24.1.0
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS=yes
@@ -14,9 +14,7 @@ ENV LC_ALL=C
 #----------
 # define TeXLive version and CTAN mirror
 ARG TEXLIVE_VERSION=2024
-# ARG TEXLIVE_MIRROR="https://us.mirrors.cicku.me/ctan/systems/texlive/tlnet"
 ARG TEXLIVE_MIRROR="https://mirror.ctan.org/systems/texlive/tlnet"
-
 # install TeXLive from CTAN mirror
 RUN mkdir /tmp/install-tl-unx && \
     curl -L ${TEXLIVE_MIRROR}/install-tl-unx.tar.gz | tar -xzv -C /tmp/install-tl-unx --strip-components=1 && \

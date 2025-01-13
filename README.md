@@ -41,5 +41,4 @@ TeX LiveをDocker上で動かすためのコンテナビルド用リポジトリ
 - `latexmk`
 - `latexdiff`
 - `stix2-otf` (v0.5.0~)
-- `plex-otf` (v24.2.0~)
 - `latexindent`

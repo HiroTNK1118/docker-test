@@ -41,7 +41,6 @@ RUN tlmgr update --self --all && \
     latexmk \
     latexdiff \
     stix2-otf \
-    plex-otf \
     latexindent && \
     mktexlsr && \
     # install create_font_cache.sh

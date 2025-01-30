@@ -1,7 +1,7 @@
 #----------
 # install base image (ghcr.io/hirotnk1118/docker-test-base)
 #----------
-FROM ghcr.io/hirotnk1118/docker-test-base:24.1.0
+FROM ghcr.io/hirotnk1118/docker-test-base:24.2.0
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS=yes
@@ -30,7 +30,7 @@ RUN mkdir /tmp/install-tl-unx && \
 # install TeX Live packages and others
 #----------
 RUN tlmgr install \
-    # collection-bibtexextra \
+    collection-bibtexextra \
     collection-latexextra \
     collection-latexrecommended \
     collection-luatex \
